@@ -59,8 +59,9 @@ test.describe('Feature: Create and Resolve High-Value Fraud Dispute', () => {
     await expect(disputeTitle).toBeVisible();
     await expect(disputeTitle).toContainText('Dispute #');
 
-    await expect(page.getByText('Reported')).toBeVisible();
-    await expect(page.getByText('P1')).toBeVisible();
+    const summaryCard = page.getByTestId('dispute-summary-card');
+    await expect(summaryCard.getByText('Reported')).toBeVisible();
+    await expect(summaryCard.getByText('P1')).toBeVisible();
 
     const triageRecommendation = page.getByTestId('triage-recommendation');
     await expect(triageRecommendation).toContainText(
@@ -77,7 +78,7 @@ test.describe('Feature: Create and Resolve High-Value Fraud Dispute', () => {
     // ─── Phase 9: Progress to Under Investigation ───────────────────────────────
     await page.getByTestId('action-investigate').click();
 
-    await expect(page.getByText('Under Investigation')).toBeVisible();
+    await expect(summaryCard.getByText('Under Investigation')).toBeVisible();
     await expect(page.getByTestId('action-escalate')).toBeVisible();
     await expect(page.getByTestId('action-resolve')).toBeVisible();
     await expect(page.getByTestId('action-refer')).toBeVisible();

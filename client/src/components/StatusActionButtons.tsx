@@ -11,7 +11,7 @@ export interface StatusActionButtonsProps {
 }
 
 const STYLE_CLASSES: Record<ActionConfig['style'], string> = {
-  primary: 'bg-indigo-700 hover:bg-indigo-800 text-white',
+  primary: 'bg-[#003366] hover:bg-[#004d99] text-white',
   amber: 'bg-amber-500 hover:bg-amber-600 text-white',
   green: 'bg-green-600 hover:bg-green-700 text-white',
   grey: 'bg-gray-500 hover:bg-gray-600 text-white',
@@ -74,7 +74,7 @@ export function StatusActionButtons({
           data-testid={action.testId}
           disabled={isLoading}
           onClick={() => handleAction(action)}
-          className={`px-4 py-2 rounded font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed ${STYLE_CLASSES[action.style]}`}
+          className={`rounded-button px-4 py-2 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 ${STYLE_CLASSES[action.style]}`}
         >
           {action.label}
         </button>

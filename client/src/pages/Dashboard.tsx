@@ -70,7 +70,14 @@ export default function Dashboard() {
             onStatusChange={setStatuses}
             onPriorityChange={setPriorities}
           />
-          <div className="mt-5 flex items-center justify-end border-t border-slate-100 pt-4">
+          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+            <p data-testid="results-count" className="text-sm text-slate-500" aria-live="polite">
+              {isLoading
+                ? 'Loading disputes…'
+                : error
+                  ? ''
+                  : `${disputes.length} ${disputes.length === 1 ? 'dispute' : 'disputes'}`}
+            </p>
             <SortControls
               sortBy={sortBy}
               sortOrder={sortOrder}

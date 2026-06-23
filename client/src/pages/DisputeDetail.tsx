@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useDisputeDetail } from '../hooks/useDisputeDetail';
 import { AppHeader } from '../components/AppHeader';
+import { StatusLifecycle } from '../components/StatusLifecycle';
 import { CustomerInfoCard } from '../components/CustomerInfoCard';
 import { DisputeSummaryCard } from '../components/DisputeSummaryCard';
 import { TriageRecommendationCard } from '../components/TriageRecommendationCard';
@@ -94,6 +95,10 @@ function DisputeDetailPage() {
                 onActionComplete={refetch}
                 onResolveClick={() => setIsResolutionModalOpen(true)}
               />
+            </div>
+
+            <div className="mb-6">
+              <StatusLifecycle status={dispute.status} />
             </div>
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

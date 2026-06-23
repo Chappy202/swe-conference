@@ -18,7 +18,7 @@ Build the `/disputes/:id` detail page following TDD. The page fetches a single d
     - Verify correct action configs for each of the 5 status values, empty arrays for terminal statuses
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 12.1_
 
-  - [ ]* 1.3 Write property tests for statusTransitions
+  - [x]* 1.3 Write property tests for statusTransitions
     - **Property 1: Action Button Accuracy** — For any valid status, `getAvailableActions` returns entries matching `VALID_TRANSITIONS[status]` exactly
     - **Property 2: Terminal State Immutability** — For any terminal status, `getAvailableActions` returns an empty array
     - **Validates: Requirements 7.1, 7.2, 7.3, 7.4, 10.1, 10.2**
@@ -45,7 +45,7 @@ Build the `/disputes/:id` detail page following TDD. The page fetches a single d
     - Implement `client/src/components/DisputeSummaryCard.tsx` using reusable StatusBadge/PriorityBadge components and formatters
     - _Requirements: 3.1, 3.2, 3.3_
 
-  - [ ]* 3.3 Write property test for priority colour mapping
+  - [x]* 3.3 Write property test for priority colour mapping
     - **Property 4: Priority Colour Mapping Consistency** — For any priority value, the badge colour and triage border colour match `PRIORITY_COLOURS` mapping
     - **Validates: Requirements 3.2, 4.2**
 
@@ -64,20 +64,20 @@ Build the `/disputes/:id` detail page following TDD. The page fetches a single d
     - Implement `client/src/components/ResolutionOutcomeDisplay.tsx`
     - _Requirements: 11.1, 11.2_
 
-  - [ ]* 3.7 Write property test for resolution outcome visibility
+  - [x]* 3.7 Write property test for resolution outcome visibility
     - **Property 3: Resolution Outcome Visibility** — For any dispute, the resolution outcome section is present in the DOM iff status is `Resolved`
     - **Validates: Requirements 11.1, 11.2**
 
 - [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement TransactionsTable and StatusActionButtons
+- [x] 5. Implement TransactionsTable and StatusActionButtons
   - [x] 5.1 Write tests and implement TransactionsTable
     - Write tests in `client/tests/components/TransactionsTable.test.tsx` verifying: renders `data-testid="transactions-table"` with columns Amount (ZAR), Merchant, Timestamp (formatted), Payment Type; renders N rows for N transactions; shows "Add Transaction" button with `data-testid="add-transaction-button"` when non-terminal, hides when terminal
     - Implement `client/src/components/TransactionsTable.tsx` (or reuse shared TransactionsTable if it exists, adding the add-transaction button)
     - _Requirements: 6.1, 6.2, 10.1, 10.2_
 
-  - [ ]* 5.2 Write property test for transaction table rendering
+  - [x]* 5.2 Write property test for transaction table rendering
     - **Property 5: Transaction Table Rendering Fidelity** — For any list of N transactions, the table renders exactly N data rows with ZAR-formatted amounts and correctly formatted timestamps
     - **Validates: Requirements 6.1, 6.2**
 
@@ -86,17 +86,17 @@ Build the `/disputes/:id` detail page following TDD. The page fetches a single d
     - Implement `client/src/components/StatusActionButtons.tsx` using `getAvailableActions()` utility
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 8.2, 8.3, 8.4, 8.5_
 
-- [ ] 6. Implement modals
+- [x] 6. Implement modals
   - [x] 6.1 Write tests and implement ResolutionOutcomeModal
     - Write tests in `client/tests/components/ResolutionOutcomeModal.test.tsx` verifying: renders modal with `data-testid="resolution-modal"` when open, shows overlay, close button, cancel button, confirm button, three radio options (Refunded, Declined, Chargeback Initiated) with correct test IDs, confirm disabled until selection, submits PATCH with `{ status: "Resolved", resolutionOutcome: selected }`, closes on cancel/close/overlay click without API call, shows spinner "Resolving..." during submission, shows inline error on failure
     - Implement `client/src/components/ResolutionOutcomeModal.tsx`
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9_
 
-  - [ ]* 6.2 Write property test for modal dismiss safety
+  - [x]* 6.2 Write property test for modal dismiss safety
     - **Property 6: Modal Dismiss Safety** — For any dismissal method (Cancel, close button, overlay), the modal closes without making an API request
     - **Validates: Requirements 9.7**
 
-  - [ ]* 6.3 Write property test for resolution payload correctness
+  - [x]* 6.3 Write property test for resolution payload correctness
     - **Property 7: Resolution Payload Correctness** — For any resolution outcome selection, the PATCH payload contains exactly `{ status: "Resolved", resolutionOutcome: selected_value }`
     - **Validates: Requirements 9.5**
 
@@ -105,7 +105,7 @@ Build the `/disputes/:id` detail page following TDD. The page fetches a single d
     - Implement `client/src/components/AddTransactionModal.tsx`
     - _Requirements: 10.3, 10.4, 10.5, 10.6, 10.7, 10.8, 10.9, 10.10_
 
-  - [ ]* 6.5 Write property test for add transaction validation gate
+  - [x]* 6.5 Write property test for add transaction validation gate
     - **Property 8: Add Transaction Validation Gate** — For any combination of form values, the submit button is enabled iff amount > 0, merchant non-empty, timestamp non-empty, and payment type selected
     - **Validates: Requirements 10.5**
 

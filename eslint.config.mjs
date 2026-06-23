@@ -55,6 +55,7 @@ export default tseslint.config(
     files: [
       'server/**/*.ts',
       'client/e2e/**/*.ts',
+      'scripts/**/*.{js,mjs,cjs}',
       '**/*.config.{js,ts,mjs,cjs}',
       'eslint.config.mjs',
     ],

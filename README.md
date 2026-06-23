@@ -40,7 +40,10 @@ cd node-conf-starter
 # 2. Install everything (both workspaces) from the committed lockfile
 npm install        # or `npm ci` for an exact, reproducible install
 
-# 3. Run both apps
+# 3. Bootstrap the database (creates server/.env, runs migrations, seeds data)
+npm run setup
+
+# 4. Run both apps
 npm run dev
 ```
 
@@ -48,7 +51,9 @@ npm run dev
 - Backend:  http://localhost:3001
 - The Vite dev server proxies `/api/*` to the backend, so the app works out of the box.
 
-That's it — no environment file or database needed to get started.
+`npm run setup` is a one-shot, idempotent bootstrap: it copies `server/.env`
+from the example, generates the Prisma client, applies migrations to create the
+SQLite database, and seeds development data. Re-running it is safe.
 
 > The backend listens on port **3001** by default. Port 5000 is intentionally avoided because macOS uses it for AirPlay Receiver. Override with `PORT` in `server/.env` if needed.
 
@@ -106,9 +111,14 @@ npm run test:e2e
 
 E2E tests live in `client/e2e/`. Playwright starts the client dev server automatically.
 
-## Database (optional)
+## Database
 
-SQLite + Prisma is preconfigured but **not required to run the app**. To use it:
+The Dispute Triage System uses SQLite + Prisma and **requires the database**
+to be set up before the app is useful (the dashboard reads disputes from the
+API). The quickest path is `npm run setup` (see Quick Start above), which runs
+all of the steps below for you.
+
+To do it manually:
 
 ```bash
 # 1. Create the server env file
@@ -117,6 +127,9 @@ cp server/.env.example server/.env
 # 2. Generate the Prisma client and create the database
 npm run db:generate --workspace=server
 npm run db:migrate --workspace=server
+
+# 3. Seed development data (customers, disputes, transactions)
+npm run db:seed --workspace=server
 ```
 
 Other database scripts (run with `--workspace=server`):

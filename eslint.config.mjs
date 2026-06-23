@@ -14,6 +14,9 @@ export default tseslint.config(
       '**/node_modules/**',
       '**/playwright-report/**',
       '**/test-results/**',
+      // Kiro skill tooling scripts run in their own runtimes (Reveal.js,
+      // standalone Node CLIs) and are not part of the application source.
+      '.kiro/**',
     ],
   },
   js.configs.recommended,

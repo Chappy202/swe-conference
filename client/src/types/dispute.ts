@@ -65,3 +65,69 @@ export interface AddTransactionRequest {
   timestamp: string;
   paymentType: PaymentType;
 }
+
+// ─── Create Dispute Form types ──────────────────────────────────────────────
+
+/** Form state for a single transaction entry (all values are strings for controlled inputs). */
+export interface TransactionFormState {
+  amount: string;
+  merchant: string;
+  timestamp: string;
+  paymentType: string;
+}
+
+/** Validation errors for a single transaction entry group. */
+export interface TransactionFieldErrors {
+  amount: string | null;
+  merchant: string | null;
+  timestamp: string | null;
+  paymentType: string | null;
+}
+
+/** Top-level form state managed by the CreateDisputePage component. */
+export interface CreateDisputeFormState {
+  selectedCustomerId: number | null;
+  transactions: TransactionFormState[];
+  validationErrors: TransactionFieldErrors[];
+  customerError: string | null;
+  isSubmitting: boolean;
+  submitError: string | null;
+}
+
+/** POST /api/disputes request body (matches OpenAPI CreateDisputeRequest). */
+export interface CreateDisputePayload {
+  customerId: number;
+  dateRaised: string;
+  totalAmount: number;
+  transactions: {
+    amount: number;
+    merchant: string;
+    timestamp: string;
+    paymentType: PaymentType;
+  }[];
+}
+
+/** Minimal shape of the POST /api/disputes response needed for redirect. */
+export interface CreateDisputeResponse {
+  id: number;
+}
+
+/** Factory for an empty transaction form state. */
+export function createEmptyTransaction(): TransactionFormState {
+  return {
+    amount: '',
+    merchant: '',
+    timestamp: '',
+    paymentType: '',
+  };
+}
+
+/** Factory for empty field errors. */
+export function createEmptyErrors(): TransactionFieldErrors {
+  return {
+    amount: null,
+    merchant: null,
+    timestamp: null,
+    paymentType: null,
+  };
+}

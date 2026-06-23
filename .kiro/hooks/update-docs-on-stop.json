@@ -1,0 +1,14 @@
+{
+  "version": "v1",
+  "hooks": [
+    {
+      "name": "Update project docs after execution",
+      "trigger": "Stop",
+      "description": "After agent execution completes, reviews recent changes and updates AGENTS.md, product.md, structure.md, and tech.md if they've fallen out of sync with what was built.",
+      "action": {
+        "type": "agent",
+        "prompt": "Before finishing, review the work completed in this session and determine if any of the following documentation files need updating to reflect new or changed functionality:\n\n1. **AGENTS.md** — Project structure, commands, patterns, conventions\n2. **.kiro/steering/product.md** — Product constraints, domain rules, data model, UI expectations\n3. **.kiro/steering/structure.md** — File/folder structure and conventions\n4. **.kiro/steering/tech.md** — Technology stack, build tools, common commands\n\nFor each file, check:\n- Were new files/folders added that should be reflected in the structure docs?\n- Were new dependencies, scripts, or tooling introduced that belong in tech docs?\n- Were new API routes, services, components, or patterns created that should be documented in AGENTS.md?\n- Were domain rules, data models, or UI flows changed that affect product.md?\n\nOnly update files where the content is materially out of date relative to what was just built. Do not make cosmetic changes. Keep the existing format and style of each document."
+      }
+    }
+  ]
+}

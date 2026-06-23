@@ -1,0 +1,29 @@
+{
+  "pbtResults": {
+    "3.2 Write property test: Reflexivity Forbidden": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211208600
+    },
+    "3.4 Write property test: Terminal Completeness": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211208681
+    },
+    "3.5 Write property test: Invalid Transition Error Content": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211209566
+    },
+    "3.6 Write property test: Resolution Outcome Guard": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211210336
+    },
+    "3.7 Write property test: Outcome Does Not Override FSM": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211211178
+    },
+    "3.8 Write property test: Determinism": {
+      "status": "passed",
+      "lastRunTimestamp": 1782211211958
+    }
+  },
+  "executionHistory": {}
+}

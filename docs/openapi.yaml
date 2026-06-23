@@ -1,0 +1,778 @@
+openapi: 3.0.3
+info:
+  title: Dispute Triage System API
+  description: Internal REST API for banking operations dispute triage and routing prototype
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3001
+    description: Development server
+
+tags:
+  - name: Customers
+    description: Pre-seeded customer records
+  - name: Disputes
+    description: Dispute lifecycle management and triage
+  - name: Transactions
+    description: Transaction management within disputes
+
+paths:
+  /api/customers:
+    get:
+      operationId: listCustomers
+      summary: List all customers
+      description: Returns a JSON array of all pre-seeded customers.
+      tags:
+        - Customers
+      responses:
+        '200':
+          description: List of all customers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Customer'
+              example:
+                - id: 1
+                  name: Thabo Mokoena
+                  contactReference: '+27 82 345 6789'
+                  accountIdentifier: '4532-XXXX-XXXX-8821'
+                  createdAt: '2025-06-20T08:00:00.000Z'
+                - id: 2
+                  name: Naledi Dlamini
+                  contactReference: naledi.dlamini@email.co.za
+                  accountIdentifier: '6221-XXXX-XXXX-4410'
+                  createdAt: '2025-06-20T08:00:00.000Z'
+
+  /api/disputes:
+    get:
+      operationId: listDisputes
+      summary: List disputes
+      description: List disputes with optional filtering and sorting.
+      tags:
+        - Disputes
+      parameters:
+        - name: status
+          in: query
+          description: Comma-separated list of statuses to filter by.
+          required: false
+          schema:
+            type: string
+          example: Reported,UnderInvestigation
+        - name: priority
+          in: query
+          description: Comma-separated list of priorities to filter by.
+          required: false
+          schema:
+            type: string
+          example: P1,P2
+        - name: sortBy
+          in: query
+          description: Field to sort results by.
+          required: false
+          schema:
+            type: string
+            enum:
+              - dateRaised
+              - totalAmount
+              - priority
+            default: priority
+        - name: sortOrder
+          in: query
+          description: Sort direction.
+          required: false
+          schema:
+            type: string
+            enum:
+              - asc
+              - desc
+            default: desc
+      responses:
+        '200':
+          description: List of disputes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DisputeSummary'
+              example:
+                - id: 1
+                  customerId: 1
+                  customerName: Thabo Mokoena
+                  status: Reported
+                  category: Unauthorised/Fraudulent Charge
+                  totalAmount: 16500
+                  dateRaised: '2025-06-22T07:30:00.000Z'
+                  priority: P1
+                  recommendation: Immediate Fraud Freeze + P1 High Priority Escalation
+                  resolutionOutcome: null
+                  createdAt: '2025-06-22T07:30:00.000Z'
+                  updatedAt: '2025-06-22T07:30:00.000Z'
+
+    post:
+      operationId: createDispute
+      summary: Create a new dispute
+      description: Create a new dispute with one or more transactions. Triggers triage evaluation.
+      tags:
+        - Disputes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDisputeRequest'
+            example:
+              customerId: 1
+              transactions:
+                - amount: 8500
+                  merchant: Woolworths Sandton
+                  timestamp: '2025-06-21T14:22:00.000Z'
+                  paymentType: ApplePay
+                - amount: 4200
+                  merchant: Clicks Rosebank
+                  timestamp: '2025-06-21T14:45:00.000Z'
+                  paymentType: ApplePay
+                - amount: 3800
+                  merchant: Engen Garage
+                  timestamp: '2025-06-21T15:10:00.000Z'
+                  paymentType: ApplePay
+      responses:
+        '201':
+          description: Dispute created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisputeDetail'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: VALIDATION_ERROR
+                  message: At least one transaction is required.
+                  status: 400
+                  timestamp: '2025-06-22T10:00:00.000Z'
+
+  /api/disputes/{id}:
+    get:
+      operationId: getDispute
+      summary: Get dispute detail
+      description: Get full dispute detail including customer, transactions, and triage data.
+      tags:
+        - Disputes
+      parameters:
+        - $ref: '#/components/parameters/DisputeId'
+      responses:
+        '200':
+          description: Dispute detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisputeDetail'
+              example:
+                id: 1
+                customerId: 1
+                customer:
+                  id: 1
+                  name: Thabo Mokoena
+                  contactReference: '+27 82 345 6789'
+                  accountIdentifier: '4532-XXXX-XXXX-8821'
+                status: Reported
+                category: Unauthorised/Fraudulent Charge
+                totalAmount: 16500
+                dateRaised: '2025-06-22T07:30:00.000Z'
+                priority: P1
+                recommendation: Immediate Fraud Freeze + P1 High Priority Escalation
+                ruleTrace:
+                  evaluatedAt: '2025-06-22T07:30:00.000Z'
+                  inputs:
+                    youngestTransactionAge: 17 hours
+                    totalAmount: 16500
+                  rules:
+                    - rule: R1
+                      condition: Any transaction age < 48h
+                      result: true
+                      detail: 'Transaction #1 age = 17h'
+                    - rule: R2
+                      condition: Total amount > R10,000
+                      result: true
+                      detail: Total = R16,500
+                  recommendation: Immediate Fraud Freeze + P1 High Priority Escalation
+                  priority: P1
+                resolutionOutcome: null
+                transactions:
+                  - id: 1
+                    amount: 8500
+                    merchant: Woolworths Sandton
+                    timestamp: '2025-06-21T14:22:00.000Z'
+                    paymentType: ApplePay
+                    createdAt: '2025-06-22T07:30:00.000Z'
+                  - id: 2
+                    amount: 4200
+                    merchant: Clicks Rosebank
+                    timestamp: '2025-06-21T14:45:00.000Z'
+                    paymentType: ApplePay
+                    createdAt: '2025-06-22T07:30:00.000Z'
+                  - id: 3
+                    amount: 3800
+                    merchant: Engen Garage
+                    timestamp: '2025-06-21T15:10:00.000Z'
+                    paymentType: ApplePay
+                    createdAt: '2025-06-22T07:30:00.000Z'
+                createdAt: '2025-06-22T07:30:00.000Z'
+                updatedAt: '2025-06-22T07:30:00.000Z'
+        '404':
+          description: Dispute not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: DISPUTE_NOT_FOUND
+                  message: Dispute with id 999 not found.
+                  status: 404
+                  timestamp: '2025-06-22T10:00:00.000Z'
+
+  /api/disputes/{id}/status:
+    patch:
+      operationId: updateDisputeStatus
+      summary: Transition dispute status
+      description: |
+        Transition the dispute to a new status. Valid transitions:
+        - Reported → UnderInvestigation
+        - UnderInvestigation → Escalated | Resolved | Referred
+        - Escalated → Resolved
+
+        When transitioning to Resolved, a resolutionOutcome is required.
+      tags:
+        - Disputes
+      parameters:
+        - $ref: '#/components/parameters/DisputeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StatusTransitionRequest'
+            example:
+              status: UnderInvestigation
+      responses:
+        '200':
+          description: Status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisputeDetail'
+        '400':
+          description: Invalid status transition or missing resolution outcome
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                invalidTransition:
+                  summary: Invalid status transition
+                  value:
+                    error:
+                      code: INVALID_STATUS_TRANSITION
+                      message: "Cannot transition from 'Reported' to 'Resolved'."
+                      status: 400
+                      timestamp: '2025-06-22T10:00:00.000Z'
+                missingOutcome:
+                  summary: Missing resolution outcome
+                  value:
+                    error:
+                      code: MISSING_RESOLUTION_OUTCOME
+                      message: A resolution outcome is required when transitioning to Resolved.
+                      status: 400
+                      timestamp: '2025-06-22T10:00:00.000Z'
+        '404':
+          description: Dispute not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: DISPUTE_NOT_FOUND
+                  message: Dispute with id 999 not found.
+                  status: 404
+                  timestamp: '2025-06-22T10:00:00.000Z'
+
+  /api/disputes/{id}/transactions:
+    post:
+      operationId: addTransaction
+      summary: Add a transaction to an existing dispute
+      description: Add a transaction to an existing dispute. Triggers triage re-evaluation.
+      tags:
+        - Transactions
+      parameters:
+        - $ref: '#/components/parameters/DisputeId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddTransactionRequest'
+            example:
+              amount: 2750
+              merchant: Woolworths Sandton
+              timestamp: '2025-06-21T15:30:00.000Z'
+              paymentType: Card
+      responses:
+        '200':
+          description: Transaction added and triage re-evaluated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DisputeDetail'
+        '400':
+          description: Validation error or dispute in terminal state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                terminalState:
+                  summary: Dispute in terminal state
+                  value:
+                    error:
+                      code: DISPUTE_IN_TERMINAL_STATE
+                      message: Cannot add transactions to a resolved or referred dispute.
+                      status: 400
+                      timestamp: '2025-06-22T10:00:00.000Z'
+                validationError:
+                  summary: Validation error
+                  value:
+                    error:
+                      code: VALIDATION_ERROR
+                      message: Transaction amount must be greater than 0.
+                      status: 400
+                      timestamp: '2025-06-22T10:00:00.000Z'
+        '404':
+          description: Dispute not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: DISPUTE_NOT_FOUND
+                  message: Dispute with id 999 not found.
+                  status: 404
+                  timestamp: '2025-06-22T10:00:00.000Z'
+
+components:
+  parameters:
+    DisputeId:
+      name: id
+      in: path
+      required: true
+      description: Dispute ID
+      schema:
+        type: integer
+      example: 1
+
+  schemas:
+    Status:
+      type: string
+      enum:
+        - Reported
+        - UnderInvestigation
+        - Escalated
+        - Resolved
+        - Referred
+
+    Priority:
+      type: string
+      enum:
+        - P1
+        - P2
+        - Standard
+
+    PaymentType:
+      type: string
+      enum:
+        - Card
+        - ApplePay
+        - EFT
+
+    ResolutionOutcome:
+      type: string
+      enum:
+        - Refunded
+        - Declined
+        - ChargebackInitiated
+
+    Customer:
+      type: object
+      required:
+        - id
+        - name
+        - contactReference
+        - accountIdentifier
+        - createdAt
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: Thabo Mokoena
+        contactReference:
+          type: string
+          example: '+27 82 345 6789'
+        accountIdentifier:
+          type: string
+          example: '4532-XXXX-XXXX-8821'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-06-20T08:00:00.000Z'
+
+    DisputeSummary:
+      type: object
+      required:
+        - id
+        - customerId
+        - customerName
+        - status
+        - category
+        - totalAmount
+        - dateRaised
+        - priority
+        - recommendation
+        - resolutionOutcome
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          example: 1
+        customerId:
+          type: integer
+          example: 1
+        customerName:
+          type: string
+          example: Thabo Mokoena
+        status:
+          $ref: '#/components/schemas/Status'
+        category:
+          type: string
+          example: Unauthorised/Fraudulent Charge
+        totalAmount:
+          type: number
+          description: Total disputed amount in ZAR
+          example: 16500
+        dateRaised:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        recommendation:
+          type: string
+          example: Immediate Fraud Freeze + P1 High Priority Escalation
+        resolutionOutcome:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/ResolutionOutcome'
+          example: null
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+
+    Transaction:
+      type: object
+      required:
+        - id
+        - amount
+        - merchant
+        - timestamp
+        - paymentType
+        - createdAt
+      properties:
+        id:
+          type: integer
+          example: 1
+        amount:
+          type: number
+          description: Transaction amount in ZAR
+          example: 8500
+        merchant:
+          type: string
+          example: Woolworths Sandton
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-06-21T14:22:00.000Z'
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+
+    RuleTraceEntry:
+      type: object
+      required:
+        - rule
+        - condition
+        - result
+        - detail
+      properties:
+        rule:
+          type: string
+          example: R1
+        condition:
+          type: string
+          example: Any transaction age < 48h
+        result:
+          type: boolean
+          example: true
+        detail:
+          type: string
+          example: 'Transaction #1 age = 17h'
+
+    RuleTrace:
+      type: object
+      required:
+        - evaluatedAt
+        - inputs
+        - rules
+        - recommendation
+        - priority
+      properties:
+        evaluatedAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+        inputs:
+          type: object
+          required:
+            - youngestTransactionAge
+            - totalAmount
+          properties:
+            youngestTransactionAge:
+              type: string
+              example: 17 hours
+            totalAmount:
+              type: number
+              description: Sum of all transaction amounts in ZAR
+              example: 16500
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/RuleTraceEntry'
+        recommendation:
+          type: string
+          example: Immediate Fraud Freeze + P1 High Priority Escalation
+        priority:
+          $ref: '#/components/schemas/Priority'
+
+    DisputeDetail:
+      type: object
+      required:
+        - id
+        - customerId
+        - customer
+        - status
+        - category
+        - totalAmount
+        - dateRaised
+        - priority
+        - recommendation
+        - ruleTrace
+        - resolutionOutcome
+        - transactions
+        - createdAt
+        - updatedAt
+      properties:
+        id:
+          type: integer
+          example: 1
+        customerId:
+          type: integer
+          example: 1
+        customer:
+          type: object
+          required:
+            - id
+            - name
+            - contactReference
+            - accountIdentifier
+          properties:
+            id:
+              type: integer
+              example: 1
+            name:
+              type: string
+              example: Thabo Mokoena
+            contactReference:
+              type: string
+              example: '+27 82 345 6789'
+            accountIdentifier:
+              type: string
+              example: '4532-XXXX-XXXX-8821'
+        status:
+          $ref: '#/components/schemas/Status'
+        category:
+          type: string
+          example: Unauthorised/Fraudulent Charge
+        totalAmount:
+          type: number
+          description: Total disputed amount in ZAR
+          example: 16500
+        dateRaised:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+        priority:
+          $ref: '#/components/schemas/Priority'
+        recommendation:
+          type: string
+          example: Immediate Fraud Freeze + P1 High Priority Escalation
+        ruleTrace:
+          $ref: '#/components/schemas/RuleTrace'
+        resolutionOutcome:
+          nullable: true
+          allOf:
+            - $ref: '#/components/schemas/ResolutionOutcome'
+          example: null
+        transactions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-06-22T07:30:00.000Z'
+
+    CreateDisputeRequest:
+      type: object
+      required:
+        - customerId
+        - transactions
+      properties:
+        customerId:
+          type: integer
+          example: 1
+        transactions:
+          type: array
+          minItems: 1
+          items:
+            type: object
+            required:
+              - amount
+              - merchant
+              - timestamp
+              - paymentType
+            properties:
+              amount:
+                type: number
+                minimum: 0.01
+                description: Transaction amount in ZAR
+                example: 8500
+              merchant:
+                type: string
+                example: Woolworths Sandton
+              timestamp:
+                type: string
+                format: date-time
+                example: '2025-06-21T14:22:00.000Z'
+              paymentType:
+                $ref: '#/components/schemas/PaymentType'
+
+    StatusTransitionRequest:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - UnderInvestigation
+            - Escalated
+            - Resolved
+            - Referred
+          example: UnderInvestigation
+        resolutionOutcome:
+          description: Required when status is Resolved.
+          allOf:
+            - $ref: '#/components/schemas/ResolutionOutcome'
+          example: Refunded
+
+    AddTransactionRequest:
+      type: object
+      required:
+        - amount
+        - merchant
+        - timestamp
+        - paymentType
+      properties:
+        amount:
+          type: number
+          minimum: 0.01
+          description: Transaction amount in ZAR
+          example: 2750
+        merchant:
+          type: string
+          example: Clicks Rosebank
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-06-21T15:30:00.000Z'
+        paymentType:
+          $ref: '#/components/schemas/PaymentType'
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+            - status
+            - timestamp
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              enum:
+                - DISPUTE_NOT_FOUND
+                - INVALID_STATUS_TRANSITION
+                - MISSING_RESOLUTION_OUTCOME
+                - DISPUTE_IN_TERMINAL_STATE
+                - VALIDATION_ERROR
+              example: DISPUTE_NOT_FOUND
+            message:
+              type: string
+              description: Human-readable error description
+              example: Dispute with id 999 not found.
+            status:
+              type: integer
+              description: HTTP status code
+              example: 404
+            timestamp:
+              type: string
+              format: date-time
+              description: ISO 8601 timestamp of when the error occurred
+              example: '2025-06-22T10:00:00.000Z'

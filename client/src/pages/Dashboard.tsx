@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Priority, SortField, SortOrder, Status } from '../types';
 import { useDisputes } from '../hooks/useDisputes';
+import { AppHeader } from '../components/AppHeader';
 import { FilterBar } from '../components/FilterBar';
 import { SortControls } from '../components/SortControls';
 import { DisputesTable } from '../components/DisputesTable';
@@ -39,43 +40,45 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <header
-        data-testid="app-header"
-        className="flex h-16 items-center bg-[#003366] px-6 text-white"
-      >
-        <span className="text-lg font-semibold">Dispute Triage</span>
-      </header>
+      <AppHeader />
 
       <main className="mx-auto max-w-7xl px-6 py-8">
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">All Disputes</h1>
+        <div className="mb-6 flex items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">All Disputes</h1>
+            <p className="mt-1 text-sm text-slate-500">
+              Review, filter and triage open customer disputes.
+            </p>
+          </div>
           <button
             type="button"
             data-testid="new-dispute-button"
             onClick={() => navigate('/disputes/new')}
-            className="rounded-button bg-[#003366] px-4 py-2 text-sm font-medium text-white hover:bg-[#004d99]"
+            className="rounded-button bg-[#003366] px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#004d99]"
           >
             New Dispute
           </button>
         </div>
 
-        <div className="mb-6">
+        <section
+          aria-label="Filters and sorting"
+          className="mb-6 rounded-card border border-slate-200 bg-white p-5 shadow-sm"
+        >
           <FilterBar
             statuses={statuses}
             priorities={priorities}
             onStatusChange={setStatuses}
             onPriorityChange={setPriorities}
           />
-        </div>
-
-        <div className="mb-6">
-          <SortControls
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            onSortByChange={setSortBy}
-            onSortOrderChange={setSortOrder}
-          />
-        </div>
+          <div className="mt-5 flex items-center justify-end border-t border-slate-100 pt-4">
+            <SortControls
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSortByChange={setSortBy}
+              onSortOrderChange={setSortOrder}
+            />
+          </div>
+        </section>
 
         <DisputesTable disputes={disputes} isLoading={isLoading} error={error} onRetry={refetch} />
       </main>

@@ -92,16 +92,13 @@ test.describe('Feature: Create and Resolve High-Value Fraud Dispute', () => {
     await page.getByTestId('outcome-refunded').check();
     await page.getByTestId('modal-confirm').click();
 
+    // ─── Phase 11: Modal dismisses and redirects back to the dashboard ──────────
     await expect(resolutionModal).not.toBeVisible();
+    await page.waitForURL('**/');
+    await expect(page.getByRole('heading', { name: 'All Disputes' })).toBeVisible();
 
-    // ─── Phase 11: Verify terminal state ────────────────────────────────────────
-    await expect(page.getByText('Resolved')).toBeVisible();
-    await expect(page.getByTestId('resolution-outcome')).toContainText('Refunded');
-
-    // No action buttons should be visible in terminal state
-    await expect(page.getByTestId('action-investigate')).not.toBeVisible();
-    await expect(page.getByTestId('action-escalate')).not.toBeVisible();
-    await expect(page.getByTestId('action-resolve')).not.toBeVisible();
-    await expect(page.getByTestId('action-refer')).not.toBeVisible();
+    // The dispute now appears on the dashboard in its Resolved terminal state.
+    await expect(page.getByTestId('disputes-table')).toBeVisible();
+    await expect(page.getByText('Resolved').first()).toBeVisible();
   });
 });

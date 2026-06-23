@@ -38,7 +38,43 @@ function toggle<T>(current: T[], value: T, order: T[]): T[] {
   return order.filter((item) => next.includes(item));
 }
 
-/** Filter section with status and priority checkbox groups. */
+/** Props for a single chip-style filter toggle. */
+interface FilterChipProps {
+  id: string;
+  label: string;
+  checked: boolean;
+  onToggle: () => void;
+}
+
+/**
+ * A pill-shaped toggle backed by a real (visually hidden) checkbox so the
+ * control stays keyboard- and screen-reader-accessible. Selected chips fill
+ * with the brand navy; unselected chips read as quiet outlines.
+ */
+function FilterChip({ id, label, checked, onToggle }: FilterChipProps) {
+  return (
+    <label
+      htmlFor={id}
+      className={`cursor-pointer select-none rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+        checked
+          ? 'border-[#003366] bg-[#003366] text-white'
+          : 'border-slate-300 bg-white text-slate-600 hover:border-slate-400 hover:text-slate-800'
+      }`}
+    >
+      <input
+        id={id}
+        type="checkbox"
+        data-testid={id}
+        checked={checked}
+        onChange={onToggle}
+        className="sr-only"
+      />
+      {label}
+    </label>
+  );
+}
+
+/** Filter controls with status and priority chip groups. */
 export function FilterBar({
   statuses,
   priorities,
@@ -49,58 +85,40 @@ export function FilterBar({
   const priorityOrder = PRIORITY_OPTIONS.map((option) => option.value);
 
   return (
-    <section className="flex gap-12 rounded-card border border-slate-200 bg-white p-5">
+    <div className="flex flex-col gap-5 sm:flex-row sm:gap-12">
       <fieldset>
-        <legend className="mb-2 text-sm font-semibold text-slate-700">Status</legend>
-        <div className="flex flex-col gap-2">
-          {STATUS_OPTIONS.map(({ value, label }) => {
-            const id = `filter-status-${value.toLowerCase()}`;
-            return (
-              <label
-                key={value}
-                htmlFor={id}
-                className="flex items-center gap-2 text-sm text-slate-700"
-              >
-                <input
-                  id={id}
-                  type="checkbox"
-                  data-testid={id}
-                  checked={statuses.includes(value)}
-                  onChange={() => onStatusChange(toggle(statuses, value, statusOrder))}
-                  className="h-4 w-4"
-                />
-                {label}
-              </label>
-            );
-          })}
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Status
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_OPTIONS.map(({ value, label }) => (
+            <FilterChip
+              key={value}
+              id={`filter-status-${value.toLowerCase()}`}
+              label={label}
+              checked={statuses.includes(value)}
+              onToggle={() => onStatusChange(toggle(statuses, value, statusOrder))}
+            />
+          ))}
         </div>
       </fieldset>
 
       <fieldset>
-        <legend className="mb-2 text-sm font-semibold text-slate-700">Priority</legend>
-        <div className="flex flex-col gap-2">
-          {PRIORITY_OPTIONS.map(({ value, label }) => {
-            const id = `filter-priority-${value.toLowerCase()}`;
-            return (
-              <label
-                key={value}
-                htmlFor={id}
-                className="flex items-center gap-2 text-sm text-slate-700"
-              >
-                <input
-                  id={id}
-                  type="checkbox"
-                  data-testid={id}
-                  checked={priorities.includes(value)}
-                  onChange={() => onPriorityChange(toggle(priorities, value, priorityOrder))}
-                  className="h-4 w-4"
-                />
-                {label}
-              </label>
-            );
-          })}
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Priority
+        </legend>
+        <div className="flex flex-wrap gap-2">
+          {PRIORITY_OPTIONS.map(({ value, label }) => (
+            <FilterChip
+              key={value}
+              id={`filter-priority-${value.toLowerCase()}`}
+              label={label}
+              checked={priorities.includes(value)}
+              onToggle={() => onPriorityChange(toggle(priorities, value, priorityOrder))}
+            />
+          ))}
         </div>
       </fieldset>
-    </section>
+    </div>
   );
 }

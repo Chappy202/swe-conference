@@ -30,8 +30,8 @@ export function SortControls({
   const directionLabel = sortOrder === 'asc' ? 'Ascending' : 'Descending';
 
   return (
-    <section className="flex items-center gap-4">
-      <label htmlFor="sort-field" className="text-sm font-medium text-slate-700">
+    <section className="flex items-center gap-3">
+      <label htmlFor="sort-field" className="text-sm font-medium text-slate-600">
         Sort by
       </label>
       <select
@@ -39,7 +39,7 @@ export function SortControls({
         data-testid="sort-field"
         value={sortBy}
         onChange={(event) => onSortByChange(event.target.value as SortField)}
-        className="h-10 rounded-input border border-slate-300 bg-white px-3 text-sm text-slate-800"
+        className="h-10 rounded-input border border-slate-300 bg-white px-3 text-sm text-slate-800 focus:border-[#003366] focus:outline-none focus:ring-1 focus:ring-[#003366]"
       >
         {SORT_FIELD_OPTIONS.map(({ value, label }) => (
           <option key={value} value={value}>
@@ -53,8 +53,11 @@ export function SortControls({
         data-testid="sort-direction"
         aria-label={`Sort direction: ${directionLabel}. Click to toggle.`}
         onClick={() => onSortOrderChange(nextOrder)}
-        className="h-10 rounded-button border border-slate-300 bg-white px-4 text-sm font-medium text-slate-800 hover:bg-slate-50"
+        className="flex h-10 items-center gap-1.5 rounded-button border border-slate-300 bg-white px-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
       >
+        <span aria-hidden="true" className="text-slate-400">
+          {sortOrder === 'asc' ? '↑' : '↓'}
+        </span>
         {directionLabel}
       </button>
     </section>

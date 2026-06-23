@@ -4,6 +4,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
+    setupFiles: ["dotenv/config"],
     include: ["tests/**/*.test.ts"],
     coverage: {
       provider: "v8",

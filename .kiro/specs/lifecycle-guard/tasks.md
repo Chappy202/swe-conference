@@ -60,12 +60,12 @@ Implement the dispute status transition validation module at `server/src/service
     - Providing a `resolutionOutcome` cannot make an otherwise-invalid FSM transition valid
     - **Validates: Requirements 4.3**
 
-  - [ ]* 3.8 Write property test: Determinism
+  - [x]* 3.8 Write property test: Determinism
     - **Property 7: Determinism**
     - Calling `validateStatusTransition` twice with the same input produces identical results
     - **Validates: Requirements 5.1**
 
-- [ ] 4. Final checkpoint — Ensure all tests pass
+- [x] 4. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass (`npm run test --workspace=server`), ask the user if questions arise.
 
 ## Notes

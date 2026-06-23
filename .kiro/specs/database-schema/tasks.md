@@ -63,32 +63,32 @@ Replace the placeholder User model in the Prisma schema with domain entities (Cu
     - Run tests to confirm they pass
     - _Requirements: 6.1, 6.2, 6.3, 7.1, 7.2, 7.3, 7.4, 7.5, 8.1, 8.2, 8.3, 9.1, 9.2, 9.3, 9.4, 9.5_
 
-  - [ ]* 4.3 Write property test for Total Amount Integrity
+  - [x]* 4.3 Write property test for Total Amount Integrity
     - **Property 1: Total Amount Integrity**
     - For every seeded dispute, assert `totalAmount === sum(transactions.amount)`
     - **Validates: Requirements 9.1**
 
-  - [ ]* 4.4 Write property test for Category Consistency
+  - [x]* 4.4 Write property test for Category Consistency
     - **Property 2: Category Consistency**
     - For every seeded dispute, assert `category === "Unauthorised/Fraudulent Charge"`
     - **Validates: Requirements 9.2**
 
-  - [ ]* 4.5 Write property test for Rule Trace Validity
+  - [x]* 4.5 Write property test for Rule Trace Validity
     - **Property 3: Rule Trace Validity**
     - For every seeded dispute, assert `JSON.parse(ruleTrace)` succeeds and the result contains keys: `evaluatedAt`, `inputs`, `rules`, `recommendation`, `priority`
     - **Validates: Requirements 9.3**
 
-  - [ ]* 4.6 Write property test for Priority-Recommendation Alignment
+  - [x]* 4.6 Write property test for Priority-Recommendation Alignment
     - **Property 4: Priority-Recommendation Alignment**
     - For every seeded dispute, assert the `recommendation` matches the expected text from the triage matrix given the dispute's `priority` and rule trace
     - **Validates: Requirements 9.4, 7.1, 7.2, 7.3, 7.4**
 
-  - [ ]* 4.7 Write property test for Resolution Outcome Completeness
+  - [x]* 4.7 Write property test for Resolution Outcome Completeness
     - **Property 5: Resolution Outcome Completeness**
     - For every seeded dispute where `status === "Resolved"`, assert `resolutionOutcome` is one of: "Refunded", "Declined", "ChargebackInitiated"
     - **Validates: Requirements 8.3**
 
-  - [ ]* 4.8 Write property test for Triage Rule Coverage
+  - [x]* 4.8 Write property test for Triage Rule Coverage
     - **Property 6: Triage Rule Coverage**
     - Assert the seeded dataset contains at least one dispute for each of the four triage combinations, verified by checking transaction timestamps relative to `dateRaised` and total amounts against R10,000
     - **Validates: Requirements 7.1, 7.2, 7.3, 7.4**
